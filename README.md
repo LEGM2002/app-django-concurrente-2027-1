@@ -30,8 +30,7 @@ Las migraciones se aplican automáticamente al iniciar el backend.
 ## Comprobación
 
 Para comprobar que funciona bien al acceder ingresa en el navegador `http://localhost:5173/` 
-y deberías ver la palabra Hello en la página, además dale clic derecho, selecciona 
-`Inspect` y de ahí vete a `Console` y deberías ver el mensaje `{"message": "Hola Mundo... Django"}`.
+y deberías ver la página funcionando.
 
 ## Comandos útiles
 

@@ -2,7 +2,7 @@ from django.db import models
 
 # modelo supercomputadora para nuestra base de datos
 class Supercomputadora(models.Model):
-  nombre = models.CharField(max_length=100, unique=True)
+  nombre = models.CharField(max_length=100, unique=True, error_messages={'unique': 'Ya existe una supercomputadora con ese nombre'},)
   pais = models.CharField(max_length=100)
   cores = models.PositiveBigIntegerField()
   ram_tb = models.FloatField()
