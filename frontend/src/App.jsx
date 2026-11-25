@@ -1,7 +1,36 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-const API = "http://localhost:8000/api/supercomputadoras/";
+const API = `${import.meta.env.VITE_API_URL}/supercomputadoras/`;
 
 const CAMPOS = [
   { key: "nombre", label: "Nombre", type: "text" },
@@ -65,41 +94,38 @@ export default function App() {
 
       <main className="mx-auto max-w-6xl px-6 py-8">
         <div className="mb-5 flex items-end justify-between">
-          <div>
-            <p className="text-sm text-slate-500">
-              {items.length} {items.length === 1 ? "registro" : "registros"}
-            </p>
-          </div>
-          <button
-            onClick={() => setForm(VACIO)}
-            className="inline-flex items-center gap-2 cursor-pointer rounded-md bg-slate-800 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
-          >
-            <Plus className="h-4 w-4" />
+          <p className="text-sm text-muted-foreground">
+            {items.length} {items.length === 1 ? "registro" : "registros"}
+          </p>
+          <Button onClick={() => setForm(VACIO)}>
+            <Plus />
             Agregar
-          </button>
+          </Button>
         </div>
 
         {/* Tabla con los datos de las supercomputadoras */}
-        <div className="overflow-x-auto rounded-lg border border-slate-300 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 bg-slate-200 text-xs uppercase tracking-wider text-slate-500">
-              <tr>
+        <div className="rounded-lg border border-slate-300 bg-white shadow-sm">
+          <Table>
+            <TableHeader className="bg-slate-200">
+              <TableRow className="border-slate-300 hover:bg-transparent">
                 {CAMPOS.map((c) => (
-                  <th
+                  <TableHead
                     key={c.key}
-                    className={`px-4 py-3 font-medium ${c.type === "number" ? "text-right" : ""}`}
+                    className={`px-4 text-xs uppercase tracking-wider text-slate-500 ${
+                      c.type === "number" ? "text-right" : ""
+                    }`}
                   >
                     {c.label}
-                  </th>
+                  </TableHead>
                 ))}
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
+                <TableHead className="px-4" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {items.map((s) => (
-                <tr key={s.id} className="transition-colors hover:bg-slate-100">
+                <TableRow key={s.id} className="hover:bg-slate-100">
                   {CAMPOS.map((c) => (
-                    <td
+                    <TableCell
                       key={c.key}
                       className={`px-4 py-3 ${
                         c.type === "number"
@@ -110,148 +136,124 @@ export default function App() {
                       }`}
                     >
                       {c.type === "number" ? s[c.key].toLocaleString() : s[c.key]}
-                    </td>
+                    </TableCell>
                   ))}
-                  <td className="whitespace-nowrap px-4 py-3 text-right">
-                    <button
+                  <TableCell className="px-4 py-3 text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setForm(s)}
                       title="Editar"
                       aria-label={`Editar ${s.nombre}`}
-                      className="rounded p-1.5 text-slate-500 transition-colors cursor-pointer hover:bg-slate-200 hover:text-slate-800"
+                      className="text-slate-500"
                     >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
+                      <Pencil />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setDeletePopUp(s)}
                       title="Borrar"
                       aria-label={`Borrar ${s.nombre}`}
-                      className="ml-1 rounded p-1.5 text-slate-500 transition-colors cursor-pointer hover:bg-red-100 hover:text-red-800"
+                      className="ml-1 text-slate-500 hover:bg-red-100 hover:text-red-800"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
+                      <Trash2 />
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
               {items.length === 0 && (
-                <tr>
-                  <td colSpan={CAMPOS.length + 1} className="px-4 py-10 text-center text-slate-400">
+                <TableRow className="hover:bg-transparent">
+                  <TableCell
+                    colSpan={CAMPOS.length + 1}
+                    className="py-10 text-center text-slate-400"
+                  >
                     Sin registros
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </main>
 
       {/* Formulario para agregar o editar una supercomputadora */}
-      {form && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/50 p-4">
-          <form
-            onSubmit={guardar}
-            className="w-full max-w-lg rounded-lg border border-slate-200 bg-white shadow-xl"
-          >
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-              <h3 className="font-semibold text-slate-900">
-                {form.id ? "Editar" : "Agregar"} supercomputadora
-              </h3>
-              <button
-                type="button"
-                onClick={cerrarModal}
-                aria-label="Cerrar"
-                className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+      <Dialog open={!!form} onOpenChange={(open) => !open && cerrarModal()}>
+        <DialogContent className="sm:max-w-lg">
+          {form && (
+            <form onSubmit={guardar} className="grid gap-5">
+              <DialogHeader>
+                <DialogTitle>
+                  {form.id ? "Editar" : "Agregar"} supercomputadora
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Datos de la supercomputadora
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4 px-6 py-5">
-              {CAMPOS.map((c) => (
-                <label
-                  key={c.key}
-                  className={`block text-sm ${c.type === "text" ? "col-span-2" : ""}`}
-                >
-                  <span className="mb-1 pl-1 text-left block font-medium text-slate-600">
-                    {c.label}
-                  </span>
-                  <input
-                    required
-                    type={c.type}
-                    step="any"
-                    min={c.type === "number" ? 0 : undefined}
-                    value={form[c.key]}
-                    onChange={(e) =>
-                      setForm({ ...form, [c.key]: e.target.value })
-                    }
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                  />
-                  {errores?.[c.key] && (
-                    <span className="mt-1 block text-xs text-red-600">
-                      {errores[c.key][0]}
-                    </span>
-                  )}
-                </label>
-              ))}
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                {CAMPOS.map((c) => (
+                  <div
+                    key={c.key}
+                    className={`grid gap-1.5 ${c.type === "text" ? "col-span-2" : ""}`}
+                  >
+                    <Label htmlFor={c.key} className="pl-1 text-slate-600">
+                      {c.label}
+                    </Label>
+                    <Input
+                      id={c.key}
+                      required
+                      type={c.type}
+                      step="any"
+                      min={c.type === "number" ? 0 : undefined}
+                      value={form[c.key]}
+                      aria-invalid={!!errores?.[c.key]}
+                      onChange={(e) =>
+                        setForm({ ...form, [c.key]: e.target.value })
+                      }
+                    />
+                    {errores?.[c.key] && (
+                      <span className="text-xs text-destructive">
+                        {errores[c.key][0]}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-            <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-3">
-              <button
-                type="button"
-                onClick={cerrarModal}
-                className="rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="rounded-md bg-slate-800 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={cerrarModal}>
+                  Cancelar
+                </Button>
+                <Button type="submit">Guardar</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Popup en caso de querer eliminar una supercomputadora */}
-      {deletePopUp && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-900/50 p-4">
-          <div className="w-full max-w-lg rounded-lg border border-slate-200 bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-              <h3 className="font-semibold text-slate-900">Eliminar supercomputadora</h3>
-              <button
-                type="button"
-                onClick={() => setDeletePopUp(null)}
-                aria-label="Cerrar"
-                className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="px-6 py-5 text-sm text-slate-600">
+      <AlertDialog
+        open={!!deletePopUp}
+        onOpenChange={(open) => !open && setDeletePopUp(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar supercomputadora</AlertDialogTitle>
+            <AlertDialogDescription>
               ¿Estás seguro que quieres eliminar{" "}
-              <span className="font-medium text-slate-900">{deletePopUp.nombre}</span>?
-            </p>
-
-            <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-3">
-              <button
-                type="button"
-                onClick={() => setDeletePopUp(null)}
-                className="rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={confirmarBorrar}
-                className="rounded-md bg-slate-800 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <span className="font-medium text-slate-900">
+                {deletePopUp?.nombre}
+              </span>
+              ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmarBorrar}>Eliminar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

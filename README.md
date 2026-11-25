@@ -22,8 +22,12 @@ git clone https://github.com/LEGM2002/app-django-concurrente-2027-1.git # HTTPS
 # or
 git clone git@github.com:LEGM2002/app-django-concurrente-2027-1.git # SSH (Recommended)
 cd app-django-concurrente-2027-1
+cp .env.example .env   # cambia DJANGO_SECRET_KEY
 docker compose up --build
 ```
+
+Las variables de entorno (`.env`) las cargan ambos contenedores vía `env_file` en `docker-compose.yml`.
+El archivo `.env` no se sube al repositorio; usa `.env.example` como plantilla.
 
 Las migraciones se aplican automáticamente al iniciar el backend.
 
